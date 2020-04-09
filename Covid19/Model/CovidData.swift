@@ -1,16 +1,8 @@
-//
-//  CovidData.swift
-//  Covid19
-//
-//  Created by Harshvardhan Patidar on 07/04/20.
-//  Copyright © 2020 Harshvardhan Patidar. All rights reserved.
-//
-
 import Foundation
 
 struct CovidData: Decodable{
     var Global : GlobalModel
-    //var Countries = [CountryModel]
+    var Countries: [CountryModel]
 }
 
 
@@ -34,5 +26,7 @@ struct CountryModel: Decodable{
     var TotalRecovered: Int64
     var Date: String
 }
+
+
 
 

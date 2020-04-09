@@ -18,14 +18,14 @@ class ViewController: UIViewController {
     @IBOutlet weak var totalDethLbl: UILabel!
     @IBOutlet weak var newRecoveredLbl: UILabel!
     @IBOutlet weak var totalRecoveredLbl: UILabel!
-    
+    @IBOutlet weak var mainLabel: UILabel!
     
     var covidManager = CovidManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         covidManager.delegate = self
-        covidManager.performSummaryRequest()
+        covidManager.performSummaryRequest(countryName: nil)
     }
     
     @IBAction func refereshButton(_ sender: UIButton) {
@@ -33,26 +33,65 @@ class ViewController: UIViewController {
     }
     
     @IBOutlet weak var searchBar: UISearchBar!
-    
-    
     @IBAction func searchButton(_ sender: Any) {
-    
-        print(searchBar.text!)
-    
+        covidManager.performSummaryRequest(countryName: self.searchBar.text)
     }
+    
+    
 }
 extension ViewController: CovidManagerDelegate{
-    func didUpdateData(_ covidManager: CovidManager, data : CovidModel) {
-        DispatchQueue.main.async {
-            self.newConfirmedLbl.text = String(data.newConfirmed)
-            self.newConfirmedLbl.text = String(data.newConfirmed)
-            self.totalConfirmedLbl.text = String(data.totalConfirmed)
-            self.newDethLbl.text = String(data.newDeaths)
-            self.totalDethLbl.text = String(data.totalDeaths)
-            self.newRecoveredLbl.text = String(data.newRecovered)
-            self.totalRecoveredLbl.text = String(data.totalRecovered)
-        }
 
+//    //var covData: CovidData
+    
+    func didUpdateData(_ covidManager: CovidManager, data : CovidData, countryName: String?) {
+        //self.covData = data
+        DispatchQueue.main.async {
+            self.showCountryData(data: data, countryName: countryName)
+        }
+    }
+    
+//    func onSearchButtonClick(){
+//        DispatchQueue.main.async {
+//            //self.showCountryData(data: self.covData, countryName: self.searchBar.text)
+//        }
+//    }
+    
+    func showCountryData(data : CovidData, countryName: String?){
+        if (countryName != nil){
+            for countryDetail in data.Countries{
+                if(countryDetail.Country == countryName){
+                    self.fillData(newConfirmed: String(countryDetail.NewConfirmed),
+                                  totalConfirmed: String(countryDetail.TotalConfirmed),
+                                  newDeaths: String(countryDetail.NewDeaths),
+                                  totalDeaths: String(countryDetail.TotalDeaths),
+                                  newRecovered: String(countryDetail.NewRecovered),
+                                  totalRecovered: String(countryDetail.TotalRecovered))
+                }
+            }
+        }
+        else{
+            self.fillData(newConfirmed: String(data.Global.NewConfirmed),
+                          totalConfirmed: String(data.Global.TotalConfirmed),
+                          newDeaths: String(data.Global.NewDeaths),
+                          totalDeaths: String(data.Global.TotalDeaths),
+                          newRecovered: String(data.Global.NewRecovered),
+                          totalRecovered: String(data.Global.TotalRecovered))
+        }
+    }
+    
+    func fillData(newConfirmed: String,
+                  totalConfirmed: String,
+                  newDeaths: String,
+                  totalDeaths: String,
+                  newRecovered: String,
+                  totalRecovered: String)
+    {
+        self.newConfirmedLbl.text = newConfirmed
+        self.totalConfirmedLbl.text = totalConfirmed
+        self.newDethLbl.text = newDeaths
+        self.totalDethLbl.text = totalDeaths
+        self.newRecoveredLbl.text = newRecovered
+        self.totalRecoveredLbl.text = totalRecovered
     }
 }
 

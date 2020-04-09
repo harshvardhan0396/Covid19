@@ -1,11 +1,3 @@
-//
-//  CovidModel.swift
-//  Covid19
-//
-//  Created by Harshvardhan Patidar on 08/04/20.
-//  Copyright © 2020 Harshvardhan Patidar. All rights reserved.
-//
-
 import Foundation
 
 struct CovidModel{
@@ -17,3 +9,13 @@ struct CovidModel{
     let totalRecovered: Int64
 }
 
+
+
+struct Countries{
+    var newConfirmed: Any
+    var totalConfirmed: Any
+    var newDeaths: Any
+    var totalDeaths: Any
+    var newRecovered: Any
+    var totalRecovered: Any
+}
