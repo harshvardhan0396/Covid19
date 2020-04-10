@@ -6,55 +6,89 @@
 //  Copyright © 2020 Harshvardhan Patidar. All rights reserved.
 //
 
-import UIKit
+//https://github.com/appbrewery/Clima-iOS13-Completed/blob/master/Clima/Controller/WeatherViewController.swift
+//https://github.com/appbrewery/Todoey-Realm-iOS13-Completed/blob/master/Todoey/Controllers/TodoListViewController.swift
+//https://www.udemy.com/course/ios-13-app-development-bootcamp/learn/lecture/10929418#overview
 
-class ViewController: UIViewController {
-    
-    
+import UIKit
+import UserNotifications
+
+class ViewController: UIViewController, UNUserNotificationCenterDelegate {
     
     @IBOutlet weak var newConfirmedLbl: UILabel!
     @IBOutlet weak var totalConfirmedLbl: UILabel!
-    @IBOutlet weak var newDethLbl: UILabel!
-    @IBOutlet weak var totalDethLbl: UILabel!
+    
+    @IBOutlet weak var newDeathsLbl: UILabel!
+    
+    @IBOutlet weak var totalDeathsLbl: UILabel!
     @IBOutlet weak var newRecoveredLbl: UILabel!
     @IBOutlet weak var totalRecoveredLbl: UILabel!
     @IBOutlet weak var mainLabel: UILabel!
     
     var covidManager = CovidManager()
+    let notificationCenter = UNUserNotificationCenter.current()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         covidManager.delegate = self
+        notificationCenter.delegate = self
+        covidManager.performSummaryRequest(countryName: nil)
+        
+        notificationCenter.requestAuthorization(options: [.alert, .badge, .sound]) { (success, error) in
+        
+        }
+        userNotification()
+    }
+    
+    func userNotification(){
+        let content = UNMutableNotificationContent()
+        content.categoryIdentifier = "Covid Notification"
+        content.title = "Covid-19"
+        content.body = "Stay Home Stay Safe"
+        content.badge = 1
+        content.sound = UNNotificationSound.default
+        
+        //Attaching Image
+        
+        let url = Bundle.main.url(forResource: "AppBackground3", withExtension: "jpg")
+        let attachment = try! UNNotificationAttachment(identifier: "image", url: url!, options: [:])
+        content.attachments = [attachment]
+        
+//        var dateComponents = DateComponents()
+//        dateComponents.hour = 12
+//        dateComponents.minute = 50
+//
+//        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let identifier = "Notification Identifier"
+        let request = UNNotificationRequest.init(identifier: identifier, content: content, trigger: trigger)
+        notificationCenter.add(request)
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .badge, .sound])
+    }
+    
+    
+    @IBAction func refereshButton(_ sender: UIButton) {
         covidManager.performSummaryRequest(countryName: nil)
     }
     
-    @IBAction func refereshButton(_ sender: UIButton) {
-        
-    }
-    
     @IBOutlet weak var searchBar: UISearchBar!
+
     @IBAction func searchButton(_ sender: Any) {
         covidManager.performSummaryRequest(countryName: self.searchBar.text)
     }
-    
-    
 }
-extension ViewController: CovidManagerDelegate{
 
-//    //var covData: CovidData
+extension ViewController: CovidManagerDelegate{
     
     func didUpdateData(_ covidManager: CovidManager, data : CovidData, countryName: String?) {
-        //self.covData = data
         DispatchQueue.main.async {
             self.showCountryData(data: data, countryName: countryName)
         }
     }
-    
-//    func onSearchButtonClick(){
-//        DispatchQueue.main.async {
-//            //self.showCountryData(data: self.covData, countryName: self.searchBar.text)
-//        }
-//    }
     
     func showCountryData(data : CovidData, countryName: String?){
         if (countryName != nil){
@@ -88,8 +122,8 @@ extension ViewController: CovidManagerDelegate{
     {
         self.newConfirmedLbl.text = newConfirmed
         self.totalConfirmedLbl.text = totalConfirmed
-        self.newDethLbl.text = newDeaths
-        self.totalDethLbl.text = totalDeaths
+        self.newDeathsLbl.text = newDeaths
+        self.totalDeathsLbl.text = totalDeaths
         self.newRecoveredLbl.text = newRecovered
         self.totalRecoveredLbl.text = totalRecovered
     }

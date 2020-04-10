@@ -5,10 +5,6 @@ protocol CovidManagerDelegate{
     func didUpdateData(_ covidData: CovidManager, data: CovidData, countryName: String?)
 }
 
-
-
-
-
 struct CovidManager{
     
     var delegate: CovidManagerDelegate?
